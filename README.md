@@ -1,6 +1,7 @@
 # snakegame
 
-A new Flutter project.
+Jogo da cobrinha.
+![print do jogo atualmente](image.png)
 
 ## Getting Started
 
