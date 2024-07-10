@@ -35,8 +35,31 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
     cabecaCobrinha = posicaoCobrinha.first;
     Timer.periodic(const Duration(milliseconds: 300), (timer) {
       atualizarCobrinha();
-      verificarColisao();
+      if (verificarColisao()) {
+        timer.cancel();
+        mostrarDialogoGameOver();
+      }
     });
+  }
+
+  void mostrarDialogoGameOver() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Game Over"),
+            content: const Text("Sua cobrinha bateu!"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    iniciarJogo();
+                  },
+                  child: const Text("Recomeçar"))
+            ],
+          );
+        });
   }
 
   bool verificarColisao() {
@@ -133,8 +156,9 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
             children: [
               IconButton(
                 onPressed: () {
-                  if (direcao != Direction.direita)
+                  if (direcao != Direction.direita) {
                     direcao = Direction.esquerda;
+                  }
                 },
                 icon: const Icon(Icons.arrow_circle_left_outlined),
                 iconSize: 100,
@@ -144,8 +168,9 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
               ),
               IconButton(
                 onPressed: () {
-                  if (direcao != Direction.esquerda)
+                  if (direcao != Direction.esquerda) {
                     direcao = Direction.direita;
+                  }
                 },
                 icon: const Icon(Icons.arrow_circle_right_outlined),
                 iconSize: 100,
@@ -172,7 +197,7 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
         if (cabecaCobrinha == index) {
           return Colors.green;
         } else {
-          return Colors.white.withOpacity(0.9);
+          return Colors.lightGreenAccent.withOpacity(0.9);
         }
       } else {
         if (index == posicaoComida) {
@@ -184,17 +209,29 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
   }
 
   fazerBorda() {
+    //borda de cima
     for (int i = 0; i < coluna; i++) {
-      if (!listaBorda.contains(i)) listaBorda.add(i);
+      if (!listaBorda.contains(i)) {
+        listaBorda.add(i);
+      }
     }
+    //borda da esquerda
     for (int i = 0; i < linha * coluna; i = i + coluna) {
-      if (!listaBorda.contains(i)) listaBorda.add(i);
+      if (!listaBorda.contains(i)) {
+        listaBorda.add(i);
+      }
     }
+    //borda da direita
     for (int i = coluna - 1; i < linha * coluna; i = i + coluna) {
-      if (!listaBorda.contains(i)) listaBorda.add(i);
+      if (!listaBorda.contains(i)) {
+        listaBorda.add(i);
+      }
     }
+    //borda de baixo
     for (int i = (linha * coluna) - coluna; i < linha * coluna; i = i + 1) {
-      if (!listaBorda.contains(i)) listaBorda.add(i);
+      if (!listaBorda.contains(i)) {
+        listaBorda.add(i);
+      }
     }
   }
 }
