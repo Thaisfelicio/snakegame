@@ -1,7 +1,10 @@
 # snakegame
 
 Jogo da cobrinha.
-![print do jogo atualmente](image.png)
+
+![print do jogo atualmente](lib\img\img_readme\tela_jogo_atualizada.png)
+
+![print do game over do jogo](lib\img\img_readme\imagem_gameOver.png)
 
 ## Getting Started
 

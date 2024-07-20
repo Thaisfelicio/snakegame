@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:snakegame/pages/pontuacoes.dart';
 
 class TelaSnakeGame extends StatefulWidget {
   const TelaSnakeGame({super.key});
@@ -28,6 +29,7 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
   }
 
   void iniciarJogo() {
+    pontos = 0;
     fazerBorda();
     gerarComida();
     direcao = Direction.direita;
@@ -56,7 +58,14 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
                     Navigator.of(context).pop();
                     iniciarJogo();
                   },
-                  child: const Text("Recomeçar"))
+                  child: const Text("Recomeçar")),
+              TextButton(
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => TelaPontuacoes(
+                              melhorPontuacao: 120, pontuacoes: [10, 20]))),
+                  child: const Text("Ver pontuações"))
             ],
           );
         });
@@ -138,7 +147,7 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
 
   Widget _buildControlesJogo() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(10),
       width: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -208,7 +217,9 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
     return Colors.grey.withOpacity(0.05);
   }
 
-  fazerBorda() {
+  void fazerBorda() {
+    // listaBorda.clear();
+
     //borda de cima
     for (int i = 0; i < coluna; i++) {
       if (!listaBorda.contains(i)) {
@@ -228,6 +239,9 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
       }
     }
     //borda de baixo
+    // for (int i = coluna * 2 - 1; i < linha * coluna - 1; i += coluna) {
+    //   listaBorda.add(i);
+    // }
     for (int i = (linha * coluna) - coluna; i < linha * coluna; i = i + 1) {
       if (!listaBorda.contains(i)) {
         listaBorda.add(i);
