@@ -1,3 +1,4 @@
+import 'package:snakegame/database/user_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart';
@@ -26,7 +27,6 @@ class DB {
 
   _onCreate(db, versao) async {
     await db.execute(_usuario);
-    await db.execute(_historicoPontos);
   }
 
   String get _usuario => '''
@@ -38,10 +38,22 @@ class DB {
     );
   ''';
 
-  String get _historicoPontos => '''
-    CREATE TABLE historico (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      pontos INTEGER
-    );
-  ''';
+  Future<bool> autenticarUsuario(UserModel user) async {
+    final Database database = await _initDatabase();
+
+    var res = await database.rawQuery(
+        "SELECT * FROM usuario WHERE email = '${user.email}' AND senha = '${user.senha}' ");
+
+    if (res.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<int> criarUsuario(UserModel user) async {
+    final Database database = await _initDatabase();
+
+    return database.insert("usuario", user.toMap());
+  }
 }
