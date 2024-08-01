@@ -3,13 +3,14 @@ import 'package:snakegame/components/colors.dart';
 
 class ButtonForm extends StatelessWidget {
   final String text;
+  final void Function() aoPressionar;
 
-  const ButtonForm({required this.text, super.key});
+  const ButtonForm({required this.text, required this.aoPressionar, super.key});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: aoPressionar,
       style: ElevatedButton.styleFrom(
           textStyle: TextStyle(
             fontSize: MediaQuery.of(context).size.width / 15,

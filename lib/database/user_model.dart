@@ -7,13 +7,13 @@ String userModelToJson(List<UserModel> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson)));
 
 class UserModel {
-  int id;
+  int? id;
   String email;
   String senha;
-  String maiorPontuacao;
+  int maiorPontuacao;
 
   UserModel({
-    required this.id,
+    this.id,
     required this.email,
     required this.senha,
     required this.maiorPontuacao,

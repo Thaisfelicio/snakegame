@@ -1,13 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:snakegame/components/button_form.dart';
 import 'package:snakegame/components/colors.dart';
+import 'package:snakegame/database/db.dart';
+import 'package:snakegame/database/user_model.dart';
+import 'package:snakegame/pages/login.dart';
 
-class RegisterPage extends StatelessWidget {
-  RegisterPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
-  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
   final senhaController = TextEditingController();
+  final confirmarSenhaController = TextEditingController();
+  bool estaValidado = false;
+  bool isLoginTrue = false;
+  final DB db = DB.instance;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    senhaController.dispose();
+    confirmarSenhaController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +65,9 @@ class RegisterPage extends StatelessWidget {
                           child: Column(
                             children: <Widget>[
                               TextFormField(
-                                keyboardType: TextInputType.name,
+                                keyboardType: TextInputType.emailAddress,
                                 decoration: InputDecoration(
-                                  labelText: 'Username',
+                                  labelText: 'Email',
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                         color: AppColors.background_input),
@@ -81,10 +101,55 @@ class RegisterPage extends StatelessWidget {
                                   filled: true,
                                 ),
                               ),
+                              TextFormField(
+                                keyboardType: TextInputType.visiblePassword,
+                                decoration: InputDecoration(
+                                  labelText: 'Confirmar senha',
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(
+                                        color: AppColors.background_input),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(
+                                          color: AppColors.background_input),
+                                      borderRadius: BorderRadius.circular(10)),
+                                  fillColor: AppColors.background_input,
+                                  filled: true,
+                                ),
+                              ),
                               SizedBox(
                                   height:
                                       MediaQuery.of(context).size.width * 0.1),
-                              const ButtonForm(text: 'Cadastrar'),
+                              ButtonForm(
+                                  text: 'Cadastrar',
+                                  aoPressionar: () async {
+                                    String senha = senhaController.text;
+                                    String confirmarSenha =
+                                        confirmarSenhaController.text;
+
+                                    if (senha == confirmarSenha) {
+                                      var res = await db.autenticarUsuario(
+                                          UserModel(
+                                              email: emailController.text,
+                                              senha: senhaController.text,
+                                              maiorPontuacao: 0));
+
+                                      if (res == true) {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    LoginPage()));
+                                      } else {
+                                        setState(() {
+                                          isLoginTrue = true;
+                                        });
+                                      }
+                                    } else {
+                                      print("As senhas não correspondem.");
+                                    }
+                                  }),
                             ],
                           )))
                 ],

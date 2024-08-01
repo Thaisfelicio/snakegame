@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:snakegame/components/button_form.dart';
 import 'package:snakegame/components/colors.dart';
 
-class RegisterPage extends StatelessWidget {
-  RegisterPage({super.key});
+class LoginPage extends StatelessWidget {
+  LoginPage({super.key});
 
   final _formKey = GlobalKey<FormState>();
   final usernameController = TextEditingController();
@@ -84,7 +84,7 @@ class RegisterPage extends StatelessWidget {
                               SizedBox(
                                   height:
                                       MediaQuery.of(context).size.width * 0.1),
-                              const ButtonForm(text: 'Entrar'),
+                              ButtonForm(text: 'Entrar', aoPressionar: () {}),
                             ],
                           )))
                 ],
