@@ -1,13 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:snakegame/components/button_form.dart';
 import 'package:snakegame/components/colors.dart';
+import 'package:snakegame/database/db.dart';
+import 'package:snakegame/database/user_model.dart';
+import 'package:snakegame/pages/register.dart';
+import 'package:snakegame/pages/snake_game.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
   final _formKey = GlobalKey<FormState>();
-  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
   final senhaController = TextEditingController();
+  final DB db = DB.instance;
+
+  Future<void> loginUsuario(BuildContext context) async {
+    String email = emailController.text;
+    String senha = senhaController.text;
+
+    if (_formKey.currentState!.validate()) {
+      var usuario = await db.autenticarUsuario(
+          UserModel(email: email, senha: senha, maiorPontuacao: 0));
+
+      if (usuario != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login realizado com sucesso!')));
+
+        int? usuarioId = usuario.id;
+
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => TelaSnakeGame(usuarioId: usuarioId!)));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Credenciais inválidas!')));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +77,7 @@ class LoginPage extends StatelessWidget {
                               TextFormField(
                                 keyboardType: TextInputType.name,
                                 decoration: InputDecoration(
-                                  labelText: 'Username',
+                                  labelText: 'Email',
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                         color: AppColors.background_input),
@@ -60,6 +90,12 @@ class LoginPage extends StatelessWidget {
                                   fillColor: AppColors.background_input,
                                   filled: true,
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, insira seu email';
+                                  }
+                                  return null;
+                                },
                               ),
                               SizedBox(
                                   height:
@@ -80,11 +116,44 @@ class LoginPage extends StatelessWidget {
                                   fillColor: AppColors.background_input,
                                   filled: true,
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, insira sua senha';
+                                  }
+                                  return null;
+                                },
                               ),
                               SizedBox(
                                   height:
                                       MediaQuery.of(context).size.width * 0.1),
-                              ButtonForm(text: 'Entrar', aoPressionar: () {}),
+                              ButtonForm(
+                                  text: 'Entrar',
+                                  aoPressionar: () => loginUsuario(context)),
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.05),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              RegisterPage()));
+                                },
+                                child: Text(
+                                  'Não possui uma conta? Fazer cadastro',
+                                  style: TextStyle(
+                                      color: AppColors.snake_color,
+                                      fontSize:
+                                          MediaQuery.of(context).size.width /
+                                              20,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: AppColors.snake_color),
+                                ),
+                              ),
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.1),
                             ],
                           )))
                 ],

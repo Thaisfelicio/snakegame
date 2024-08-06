@@ -2,10 +2,13 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:snakegame/database/db.dart';
 import 'package:snakegame/pages/pontuacoes.dart';
 
 class TelaSnakeGame extends StatefulWidget {
-  const TelaSnakeGame({super.key});
+  final int usuarioId;
+
+  const TelaSnakeGame({super.key, required this.usuarioId});
 
   @override
   State<TelaSnakeGame> createState() => _TelaSnakeGameState();
@@ -21,6 +24,8 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
   int pontos = 0;
   late Direction direcao;
   late int posicaoComida;
+
+  final DB db = DB.instance;
 
   @override
   void initState() {
@@ -44,7 +49,19 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
     });
   }
 
-  void mostrarDialogoGameOver() {
+  void mostrarDialogoGameOver() async {
+    //pegar o id do user pelo parametro de login
+    final int? usuarioId = widget.usuarioId;
+
+    await db.inserirPontuacao(usuarioId!, pontos);
+    int maiorPontuacaoAtual = await db.obterMaiorPontuacao(usuarioId);
+
+    if (pontos > maiorPontuacaoAtual) {
+      await db.atualizarMaiorPontuacao(usuarioId, pontos);
+    }
+
+    List<int> pontuacoes = await db.pegarPontuacoes(usuarioId);
+
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -64,7 +81,8 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => TelaPontuacoes(
-                              melhorPontuacao: 120, pontuacoes: [10, 20]))),
+                              melhorPontuacao: maiorPontuacaoAtual,
+                              pontuacoes: pontuacoes))),
                   child: const Text("Ver pontuações"))
             ],
           );

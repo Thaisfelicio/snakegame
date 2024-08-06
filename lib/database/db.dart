@@ -38,16 +38,25 @@ class DB {
     );
   ''';
 
-  Future<bool> autenticarUsuario(UserModel user) async {
+  String get _pontuacoes => '''
+    CREATE TABLE pontuacoes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      usuarioId INTEGER,
+      pontuacao INTEGER,
+      FOREIGN KEY (usuarioId) REFERENCES usuario(id)
+    );
+  ''';
+
+  Future<UserModel?> autenticarUsuario(UserModel user) async {
     final Database database = await _initDatabase();
 
     var res = await database.rawQuery(
         "SELECT * FROM usuario WHERE email = '${user.email}' AND senha = '${user.senha}' ");
 
     if (res.isNotEmpty) {
-      return true;
+      return UserModel.fromMap(res.first);
     } else {
-      return false;
+      return null;
     }
   }
 
@@ -55,5 +64,56 @@ class DB {
     final Database database = await _initDatabase();
 
     return database.insert("usuario", user.toMap());
+  }
+
+  Future<void> inserirPontuacao(int usuarioId, int pontuacao) async {
+    final Database database = await _initDatabase();
+
+    await database.insert("pontuacoes", {
+      "usuarioId": usuarioId,
+      "pontuacao": pontuacao,
+    });
+  }
+
+  Future<List<int>> pegarPontuacoes(int usuarioId) async {
+    final Database database = await _initDatabase();
+
+    final List<Map<String, dynamic>> maps = await database.query(
+      "pontuacoes",
+      where: "usuarioId = ?",
+      whereArgs: [usuarioId],
+    );
+
+    return List.generate(maps.length, (i) {
+      return maps[i]['pontuacao'];
+    });
+  }
+
+  Future<void> atualizarMaiorPontuacao(int usuarioId, int pontuacao) async {
+    final Database database = await _initDatabase();
+
+    await database.update(
+      "usuario",
+      {"maiorPontuacao": pontuacao},
+      where: "id = ?",
+      whereArgs: [usuarioId],
+    );
+  }
+
+  Future<int> obterMaiorPontuacao(int usuarioId) async {
+    final Database database = await _initDatabase();
+
+    final List<Map<String, dynamic>> maps = await database.query(
+      "usuario",
+      where: "id = ?",
+      whereArgs: [usuarioId],
+      columns: ["maiorPontuacao"],
+    );
+
+    if (maps.isEmpty) {
+      return maps.first["maiorPontuacao"];
+    } else {
+      return 0;
+    }
   }
 }

@@ -31,7 +31,7 @@ class TelaPontuacoes extends StatelessWidget {
                       color: AppColors.background_game),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.width * 0.1),
-                MelhorPontuacao(melhorPontuacao: 100),
+                MelhorPontuacao(melhorPontuacao: melhorPontuacao),
                 SizedBox(height: MediaQuery.of(context).size.width * 0.1),
                 Text(
                   'Jogadas recentes',
@@ -43,7 +43,11 @@ class TelaPontuacoes extends StatelessWidget {
                 SizedBox(
                   height: MediaQuery.of(context).size.width * 0.1,
                 ),
-                Pontuacao(pontos: 80)
+                Column(
+                  children: pontuacoes
+                      .map((pontos) => Pontuacao(pontos: pontos))
+                      .toList(),
+                )
               ],
             ),
           ),

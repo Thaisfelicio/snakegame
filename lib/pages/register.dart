@@ -17,9 +17,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final senhaController = TextEditingController();
   final confirmarSenhaController = TextEditingController();
-  bool estaValidado = false;
-  bool isLoginTrue = false;
   final DB db = DB.instance;
+  bool isLoginTrue = false;
 
   @override
   void dispose() {
@@ -27,6 +26,37 @@ class _RegisterPageState extends State<RegisterPage> {
     senhaController.dispose();
     confirmarSenhaController.dispose();
     super.dispose();
+  }
+
+  Future<void> registrarUsuario() async {
+    String email = emailController.text;
+    String senha = senhaController.text;
+    String confirmarSenha = confirmarSenhaController.text;
+
+    if (_formKey.currentState!.validate()) {
+      if (senha == confirmarSenha) {
+        var usuarioExistente = await db.autenticarUsuario(
+            UserModel(email: email, senha: senha, maiorPontuacao: 0));
+
+        if (usuarioExistente == null) {
+          await db.criarUsuario(
+              UserModel(email: email, senha: senha, maiorPontuacao: 0));
+
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Usuário registrado com sucesso!')));
+
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => LoginPage()));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Usuário já existe!')));
+        }
+      } else {
+        print("As senhas não correspondem.");
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('As senhas não correspondem.')));
+      }
+    }
   }
 
   @override
@@ -80,6 +110,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                   fillColor: AppColors.background_input,
                                   filled: true,
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, insira seu email';
+                                  }
+                                  return null;
+                                },
                               ),
                               SizedBox(
                                   height:
@@ -100,7 +136,16 @@ class _RegisterPageState extends State<RegisterPage> {
                                   fillColor: AppColors.background_input,
                                   filled: true,
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, insira seu senha';
+                                  }
+                                  return null;
+                                },
                               ),
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.1),
                               TextFormField(
                                 keyboardType: TextInputType.visiblePassword,
                                 decoration: InputDecoration(
@@ -117,39 +162,44 @@ class _RegisterPageState extends State<RegisterPage> {
                                   fillColor: AppColors.background_input,
                                   filled: true,
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, confirme sua senha';
+                                  }
+                                  return null;
+                                },
                               ),
                               SizedBox(
                                   height:
                                       MediaQuery.of(context).size.width * 0.1),
                               ButtonForm(
-                                  text: 'Cadastrar',
-                                  aoPressionar: () async {
-                                    String senha = senhaController.text;
-                                    String confirmarSenha =
-                                        confirmarSenhaController.text;
-
-                                    if (senha == confirmarSenha) {
-                                      var res = await db.autenticarUsuario(
-                                          UserModel(
-                                              email: emailController.text,
-                                              senha: senhaController.text,
-                                              maiorPontuacao: 0));
-
-                                      if (res == true) {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    LoginPage()));
-                                      } else {
-                                        setState(() {
-                                          isLoginTrue = true;
-                                        });
-                                      }
-                                    } else {
-                                      print("As senhas não correspondem.");
-                                    }
-                                  }),
+                                text: 'Cadastrar',
+                                aoPressionar: registrarUsuario,
+                              ),
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.05),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => LoginPage()));
+                                },
+                                child: Text(
+                                  'Já tem uma conta? Fazer login',
+                                  style: TextStyle(
+                                      color: AppColors.snake_color,
+                                      fontSize:
+                                          MediaQuery.of(context).size.width /
+                                              20,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: AppColors.snake_color),
+                                ),
+                              ),
+                              SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.1),
                             ],
                           )))
                 ],
