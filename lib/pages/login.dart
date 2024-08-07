@@ -15,13 +15,12 @@ class LoginPage extends StatelessWidget {
   final DB db = DB.instance;
 
   Future<void> loginUsuario(BuildContext context) async {
-    String email = emailController.text;
-    String senha = senhaController.text;
-
     if (_formKey.currentState!.validate()) {
-      var usuario = await db.autenticarUsuario(
-          UserModel(email: email, senha: senha, maiorPontuacao: 0));
+      String email = emailController.text;
+      String senha = senhaController.text;
+      var usuario = await db.autenticarUsuario(email, senha);
 
+      print(usuario);
       if (usuario != null) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Login realizado com sucesso!')));

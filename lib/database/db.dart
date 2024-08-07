@@ -48,12 +48,11 @@ class DB {
     );
   ''';
 
-  Future<UserModel?> autenticarUsuario(UserModel user) async {
+  Future<UserModel?> autenticarUsuario(String email, String senha) async {
     final Database database = await _initDatabase();
 
-    var res = await database.rawQuery(
-        "SELECT * FROM usuario WHERE email = ? AND senha = ?",
-        [user.email, user.senha]);
+    var res = await database.query('usuario',
+        where: 'email = ? AND senha = ?', whereArgs: [email, senha]);
 
     if (res.isNotEmpty) {
       return UserModel.fromMap(res.first);

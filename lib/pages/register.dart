@@ -35,8 +35,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (_formKey.currentState!.validate()) {
       if (senha == confirmarSenha) {
-        var usuarioExistente = await db.autenticarUsuario(
-            UserModel(email: email, senha: senha, maiorPontuacao: 0));
+        var usuarioExistente = await db.autenticarUsuario(email, senha);
 
         if (usuarioExistente == null) {
           await db.criarUsuario(
