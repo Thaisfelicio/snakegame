@@ -118,4 +118,14 @@ class DB {
       return 0;
     }
   }
+
+  Future<void> deletarDatabase() async {
+    final databasePath = await getDatabasesPath();
+    final path = join(databasePath, 'JOGOCOBRINHA.db');
+
+    // Excluir o banco de dados
+    await deleteDatabase(path);
+
+    print("Banco de dados excluído com sucesso!");
+  }
 }
