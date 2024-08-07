@@ -3,12 +3,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:snakegame/database/db.dart';
+import 'package:snakegame/database/user_model.dart';
 import 'package:snakegame/pages/pontuacoes.dart';
 
 class TelaSnakeGame extends StatefulWidget {
-  final int usuarioId;
+  final UserModel usuario;
 
-  const TelaSnakeGame({super.key, required this.usuarioId});
+  const TelaSnakeGame({super.key, required this.usuario});
 
   @override
   State<TelaSnakeGame> createState() => _TelaSnakeGameState();
@@ -50,17 +51,21 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
   }
 
   void mostrarDialogoGameOver() async {
-    //pegar o id do user pelo parametro de login
-    final int? usuarioId = widget.usuarioId;
+    final UserModel usuario = widget.usuario;
 
-    await db.inserirPontuacao(usuarioId!, pontos);
-    int maiorPontuacaoAtual = await db.obterMaiorPontuacao(usuarioId);
+    await db.inserirPontuacao(usuario.id!, pontos);
+    int maiorPontuacaoAtual = await db.obterMaiorPontuacao(usuario.id!);
 
     if (pontos > maiorPontuacaoAtual) {
-      await db.atualizarMaiorPontuacao(usuarioId, pontos);
+      await db.atualizarMaiorPontuacao(usuario.id!, pontos);
     }
-
-    List<int> pontuacoes = await db.pegarPontuacoes(usuarioId);
+    print('maior P.: $maiorPontuacaoAtual');
+    List<int> pontuacoes = await db.pegarPontuacoes(usuario.id!);
+    UserModel user = UserModel(
+        id: usuario.id,
+        email: usuario.email,
+        senha: usuario.senha,
+        maiorPontuacao: maiorPontuacaoAtual);
 
     showDialog(
         context: context,
@@ -81,8 +86,7 @@ class _TelaSnakeGameState extends State<TelaSnakeGame> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => TelaPontuacoes(
-                              melhorPontuacao: maiorPontuacaoAtual,
-                              pontuacoes: pontuacoes))),
+                              usuario: user, pontuacoes: pontuacoes))),
                   child: const Text("Ver pontuações"))
             ],
           );

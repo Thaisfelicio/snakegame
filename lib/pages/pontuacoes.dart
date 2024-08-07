@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:snakegame/components/button_form.dart';
 import 'package:snakegame/components/colors.dart';
 import 'package:snakegame/components/melhor_pontuacao.dart';
 import 'package:snakegame/components/pontuacao.dart';
+import 'package:snakegame/database/user_model.dart';
+import 'package:snakegame/pages/snake_game.dart';
 
 class TelaPontuacoes extends StatelessWidget {
-  final int melhorPontuacao;
+  final UserModel usuario;
   final List<int> pontuacoes;
   const TelaPontuacoes(
-      {required this.melhorPontuacao, required this.pontuacoes, super.key});
+      {required this.usuario, required this.pontuacoes, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +34,7 @@ class TelaPontuacoes extends StatelessWidget {
                       color: AppColors.background_game),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.width * 0.1),
-                MelhorPontuacao(melhorPontuacao: melhorPontuacao),
+                MelhorPontuacao(melhorPontuacao: usuario.maiorPontuacao),
                 SizedBox(height: MediaQuery.of(context).size.width * 0.1),
                 Text(
                   'Jogadas recentes',
@@ -45,9 +48,24 @@ class TelaPontuacoes extends StatelessWidget {
                 ),
                 Column(
                   children: pontuacoes
-                      .map((pontos) => Pontuacao(pontos: pontos))
+                      .map((pontos) => Padding(
+                          padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).size.width * 0.05),
+                          child: Pontuacao(pontos: pontos)))
                       .toList(),
-                )
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.width * 0.1,
+                ),
+                ButtonForm(
+                    text: 'Voltar',
+                    aoPressionar: () {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  TelaSnakeGame(usuario: usuario)));
+                    })
               ],
             ),
           ),

@@ -20,13 +20,14 @@ class DB {
   _initDatabase() async {
     return await openDatabase(
       join(await getDatabasesPath(), 'JOGOCOBRINHA.db'),
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
     );
   }
 
   _onCreate(db, versao) async {
     await db.execute(_usuario);
+    await db.execute(_pontuacoes);
   }
 
   String get _usuario => '''
@@ -51,7 +52,8 @@ class DB {
     final Database database = await _initDatabase();
 
     var res = await database.rawQuery(
-        "SELECT * FROM usuario WHERE email = '${user.email}' AND senha = '${user.senha}' ");
+        "SELECT * FROM usuario WHERE email = ? AND senha = ?",
+        [user.email, user.senha]);
 
     if (res.isNotEmpty) {
       return UserModel.fromMap(res.first);
@@ -110,7 +112,7 @@ class DB {
       columns: ["maiorPontuacao"],
     );
 
-    if (maps.isEmpty) {
+    if (maps.isNotEmpty) {
       return maps.first["maiorPontuacao"];
     } else {
       return 0;

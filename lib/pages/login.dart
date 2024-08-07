@@ -26,12 +26,10 @@ class LoginPage extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Login realizado com sucesso!')));
 
-        int? usuarioId = usuario.id;
-
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => TelaSnakeGame(usuarioId: usuarioId!)));
+                builder: (context) => TelaSnakeGame(usuario: usuario)));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Credenciais inválidas!')));
